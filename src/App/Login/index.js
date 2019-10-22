@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import * as Facebook from 'expo-facebook';
+import React, { useState, useEffect } from "react";
+import { logInWithReadPermissionsAsync } from "expo-facebook";
 import {
   StyleSheet,
   Dimensions,
   Alert,
   ImageBackground,
   View,
-  Image,
-} from 'react-native';
+  Image
+} from "react-native";
 import {
   withTheme,
   Text,
@@ -15,22 +15,24 @@ import {
   Title,
   Paragraph,
   Button,
-  Divider,
-} from 'react-native-paper';
+  Divider
+} from "react-native-paper";
 
-import firebase from 'firebase';
+import firebase from "firebase";
 
-import Container from '../../componentes/Container';
+import Container from "../../componentes/Container";
 
-import logo from '../../../images/logo-final.png';
-import cadapiodigital from '../../../images/cadapiodigital.png';
-import { Actions } from 'react-native-router-flux';
+import logo from "../../../images/logo-final.png";
+import cadapiodigital from "../../../images/cadapiodigital.png";
+import { Actions } from "react-native-router-flux";
+import axios from "axios";
+import api from "../../utils/api";
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    alignItems: "center",
+    justifyContent: "center"
+  }
 });
 
 const Login = ({ theme }) => {
@@ -39,28 +41,26 @@ const Login = ({ theme }) => {
       <ImageBackground
         source={{
           uri:
-            'https://www.collact.com.br/wp-content/uploads/2017/08/restaurante-decoracao.png',
+            "https://www.collact.com.br/wp-content/uploads/2017/08/restaurante-decoracao.png"
         }}
         style={{
           flex: 1,
-          alignContent: 'center',
-          alignItems: 'center',
+          alignContent: "center",
+          alignItems: "center"
         }}
         resizeMode="cover"
         blurRadius={1}
       >
         <Container />
-        <Card style={{ width: '45%', heigth: '45%' }}>
+        <Card style={{ width: "45%", heigth: "45%" }}>
           <Card.Content>
-            <View
-              style={{ alignContent: 'center', alignItems: 'center' }}
-            >
+            <View style={{ alignContent: "center", alignItems: "center" }}>
               <Image
                 source={logo}
                 style={{
                   height: 128,
                   width: 128,
-                  marginBottom: 16,
+                  marginBottom: 16
                 }}
               />
               <Title>Seja bem vindo</Title>
@@ -72,26 +72,24 @@ const Login = ({ theme }) => {
                 mode="outlined"
                 icon="star"
                 onPress={async () => {
-                  try {
-    const {
-      type,
-      token,
-      expires,
-      permissions,
-      declinedPermissions,
-    } = await Facebook.logInWithReadPermissionsAsync('1229372737223999', {
-      permissions: ['public_profile'],
-    });
-    if (type === 'success') {
-      // Get the user's name using Facebook's Graph API
-      const response = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
-      Alert.alert('Logged in!', `Hi ${(await response.json()).name}!`);
-    } else {
-      // type === 'cancel'
-    }
-  } catch ({ message }) {
-    alert(`Facebook Login Error: ${message}`);
-  }
+                  const parameters = {
+                    permissions: ["public_profile", "email"]
+                  };
+                  logInWithReadPermissionsAsync("1229372737223999", parameters)
+                    .then(({ type, token }) => {
+                      if (type === "success") {
+                        const url = `https://graph.facebook.com/me?fields=name,email&access_token=${token}`;
+                        axios.get(url).then(({ data: { id, name, email } }) => {
+                          console.warn(id, name, email);
+                          api.getUsuario("szOwMCFF163FAfE5pTAu");
+                        });
+                      } else {
+                        alert("Facebook Login cancelado.");
+                      }
+                    })
+                    .catch(({ message }) => {
+                      alert(`Facebook Login Error: ${message}`);
+                    });
                 }}
               >
                 Fidelidade
@@ -104,7 +102,9 @@ const Login = ({ theme }) => {
               <Button
                 mode="outlined"
                 icon="touch-app"
-                onPress={() => Actions.main()}
+                onPress={() => {
+                  api.getUsuario("szOwMCFF163FAfE5pTAu");
+                }}
               >
                 Convidado
               </Button>
@@ -115,7 +115,7 @@ const Login = ({ theme }) => {
                 style={{
                   height: 128,
                   width: 192,
-                  marginTop: 16,
+                  marginTop: 16
                 }}
               />
             </View>
