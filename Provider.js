@@ -4,43 +4,40 @@ import React, {
   createContext,
   useContext,
   useState,
-  useEffect,
-} from 'react';
+  useEffect
+} from "react";
 
-import { StatusBar, View } from 'react-native';
-import { getStatusBarHeight } from 'react-native-status-bar-height';
-import {
-  Provider as PaperProvider,
-  Snackbar,
-} from 'react-native-paper';
+import { StatusBar, View } from "react-native";
+import { getStatusBarHeight } from "react-native-status-bar-height";
+import { Provider as PaperProvider, Snackbar } from "react-native-paper";
 
-import { themeDark, themeLigh } from './AppTheme';
-import storage from './src/utils/storage';
-import api from './src/utils/api';
+import { themeDark, themeLigh } from "./AppTheme";
+import storage from "./src/utils/storage";
+import api from "./src/utils/api";
 
 // storage.deleteAll();
 
-type Theme = 'light' | 'dark';
+type Theme = "light" | "dark";
 
 type GlobalContextType = {
   theme: Theme,
   setTheme: Theme => void,
   user: Object,
-  setUser: Function => void,
+  setUser: Function => void
 };
 
 export const GlobalContext = createContext<GlobalContextType>({
-  theme: 'light',
+  theme: "light",
   setTheme: () => undefined,
   user: {},
-  setUser: () => undefined,
+  setUser: () => undefined
 });
 
-const getThemeLocal = () => storage.getItem('theme');
-const setThemeLocal = item => storage.setItem('theme', item);
+const getThemeLocal = () => storage.getItem("theme");
+const setThemeLocal = item => storage.setItem("theme", item);
 
-const getPedidoIdLocal = () => storage.getItem('pedidoId');
-const setPedidoIdLocal = item => storage.setItem('pedidoId', item);
+const getPedidoIdLocal = () => storage.getItem("pedidoId");
+const setPedidoIdLocal = item => storage.setItem("pedidoId", item);
 
 const PaperStatusBar = ({ theme }) => (
   <>
@@ -59,21 +56,23 @@ const PaperStatusBar = ({ theme }) => (
 );
 
 type User = {
-  login: Object,
-  token: string,
+  id: String,
+  nome: String,
+  email: String,
+  senha: String
 };
 
 export const Provider = ({ children }: { children: Node }) => {
   const [visible, setVisible] = useState(false);
   const [pedidoId, setPedidoId] = useState<Number | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [theme, setTheme] = useState<Theme>('light');
-  const localTheme = theme === 'light' ? themeLigh : themeDark;
+  const [theme, setTheme] = useState<Theme>("light");
+  const localTheme = theme === "light" ? themeLigh : themeDark;
 
   useEffect(() => {
     getThemeLocal().then(item => {
-      let t = 'light';
-      if (typeof item !== 'undefined') {
+      let t = "light";
+      if (typeof item !== "undefined") {
         t = item;
       }
       setTheme(t);
@@ -83,8 +82,8 @@ export const Provider = ({ children }: { children: Node }) => {
   useEffect(() => {
     // setPedidoIdLocal(null);
     getPedidoIdLocal().then(item => {
-      console.warn(item);
-      api.getPedido(item).then(pedido => console.warn(pedido));
+      console.warn("item", item);
+      api.getPedido(item).then(pedido => console.warn("pedido", pedido));
       if (!item) {
         api.createPedido().then(newPedidoId => {
           setPedidoIdLocal(newPedidoId);
@@ -102,7 +101,7 @@ export const Provider = ({ children }: { children: Node }) => {
     user,
     setUser,
     pedidoId,
-    setPedidoId,
+    setPedidoId
   };
 
   return (
@@ -126,21 +125,21 @@ export const useTheme = () => {
   const { theme, setTheme } = useContext(GlobalContext);
   return [
     theme,
-    theme === 'light' ? themeLigh : themeDark,
+    theme === "light" ? themeLigh : themeDark,
     () => {
-      const themeLocal = theme === 'light' ? 'dark' : 'light';
+      const themeLocal = theme === "light" ? "dark" : "light";
       setTheme(themeLocal);
       setThemeLocal(themeLocal);
-    },
+    }
   ];
-};
-
-type Login = {
-  email: String,
-  senha: String,
 };
 
 export const useUser = () => {
   const { user, setUser } = useContext(GlobalContext);
   return [user, setUser];
+};
+
+export const usePedidoId = () => {
+  const { pedidoId, setPedidoId } = useContext(GlobalContext);
+  return [pedidoId, setPedidoId];
 };

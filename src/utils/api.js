@@ -39,6 +39,13 @@ const getPedido = pedidoId =>
     .get()
     .then(querySnapshot => querySnapshot.data());
 
+const getListProdutosPedido = pedidoId =>
+  db()
+    .collection("pedidos")
+    .doc(pedidoId)
+    .get()
+    .then(querySnapshot => querySnapshot.data().produtos);
+
 const getUsuario = usuarioId =>
   db()
     .collection("usuarios")
@@ -46,10 +53,17 @@ const getUsuario = usuarioId =>
     .get()
     .then(querySnapshot => querySnapshot.data());
 
-const createUsuario = ({ nome, email, senha }) =>
+const findUsuario = id =>
   db()
     .collection("usuarios")
-    .add({ nome, email, senha })
+    .get()
+    .then(converterDados)
+    .then(users => users.find(user => user.id === id));
+
+const createUsuario = ({ id, nome, email, senha }) =>
+  db()
+    .collection("usuarios")
+    .add({ id, nome, email, senha })
     .then(docRef => docRef.id)
     .catch(error => {
       console.error("Error adding document: ", error);
@@ -58,7 +72,9 @@ const createUsuario = ({ nome, email, senha }) =>
 const api = {
   createPedido,
   getPedido,
+  getListProdutosPedido,
   getListProdutos,
+  findUsuario,
   getUsuario,
   createUsuario
 };

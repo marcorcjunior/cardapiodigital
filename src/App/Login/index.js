@@ -27,6 +27,7 @@ import cadapiodigital from "../../../images/cadapiodigital.png";
 import { Actions } from "react-native-router-flux";
 import axios from "axios";
 import api from "../../utils/api";
+import { useUser } from "../../../Provider";
 
 const styles = StyleSheet.create({
   container: {
@@ -36,12 +37,20 @@ const styles = StyleSheet.create({
 });
 
 const Login = ({ theme }) => {
+  const [userGlobal, setUserGlobal] = useUser();
+
+  useEffect(() => {
+    if (userGlobal) {
+      Actions.main();
+    }
+  }, []);
+
   return (
     <Container style={{ backgroundColor: theme.colors.background }}>
       <ImageBackground
         source={{
           uri:
-            "https://www.collact.com.br/wp-content/uploads/2017/08/restaurante-decoracao.png"
+            "https://firebasestorage.googleapis.com/v0/b/cardapiodigital-2c940.appspot.com/o/cardapiodigital-baner.jpg?alt=media&token=8e72bdbf-d0a2-42fb-aaa4-8d601e1fab87"
         }}
         style={{
           flex: 1,
@@ -80,15 +89,31 @@ const Login = ({ theme }) => {
                       if (type === "success") {
                         const url = `https://graph.facebook.com/me?fields=name,email&access_token=${token}`;
                         axios.get(url).then(({ data: { id, name, email } }) => {
-                          console.warn(id, name, email);
-                          api.getUsuario("szOwMCFF163FAfE5pTAu");
+                          api.findUsuario(id).then(isExistUser => {
+                            if (isExistUser) {
+                              setUserGlobal(isExistUser);
+                              Actions.main({});
+                              return;
+                            }
+
+                            const newUser = {
+                              id,
+                              nome: name,
+                              email,
+                              senha: "cardapiodigital"
+                            };
+                            api.createUsuario(newUser);
+                            setUserGlobal(newUser);
+                            Actions.main({});
+                            return;
+                          });
                         });
                       } else {
-                        alert("Facebook Login cancelado.");
+                        alert("Login fidelidade cancelado.");
                       }
                     })
                     .catch(({ message }) => {
-                      alert(`Facebook Login Error: ${message}`);
+                      alert(`Login fidelidade com error: ${message}`);
                     });
                 }}
               >
@@ -103,7 +128,11 @@ const Login = ({ theme }) => {
                 mode="outlined"
                 icon="touch-app"
                 onPress={() => {
-                  api.getUsuario("szOwMCFF163FAfE5pTAu");
+                  // szOwMCFF163FAfE5pTAu = CONVIDADO
+                  api.getUsuario("stlPZyxEXHLvzKbNfBzc").then(user => {
+                    setUserGlobal(user);
+                    Actions.main({});
+                  });
                 }}
               >
                 Convidado

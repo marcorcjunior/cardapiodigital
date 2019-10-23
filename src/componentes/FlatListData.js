@@ -1,23 +1,23 @@
 /* @flow */
 
-import React, { type Node, useState, useEffect } from 'react';
+import React, { type Node, useState, useEffect } from "react";
 import {
   FlatList,
   RefreshControl,
   View,
-  ActivityIndicator,
-} from 'react-native';
-import { withTheme, Text, Divider } from 'react-native-paper';
+  ActivityIndicator
+} from "react-native";
+import { withTheme, Text, Divider } from "react-native-paper";
 
-import Loading from './Loading';
-import NotFound from './NotFound';
+import Loading from "./Loading";
+import NotFound from "./NotFound";
 
 type Props = {
   data: Array<Object>,
   onRefresh?: Function,
   renderItem: Function,
   keyExtractor?: Function,
-  style?: Object,
+  style?: Object
 };
 
 const FlatListData = ({
@@ -51,11 +51,9 @@ const FlatListData = ({
         ...style,
         flex: 1,
         paddingTop: 10,
-        paddingHorizontal: 10,
+        paddingHorizontal: 10
       }}
-      ItemSeparatorComponent={() => (
-        <Divider style={{ marginVertical: 4 }} />
-      )}
+      ItemSeparatorComponent={() => <Divider style={{ marginVertical: 4 }} />}
       ListEmptyComponent={() => <NotFound />}
       refreshControl={
         <RefreshControl
@@ -98,7 +96,7 @@ FlatListData.defaultProps = {
   onLoadMore: () => {},
   renderItem: item => <Text>{JSON.stringify(item)}</Text>,
   keyExtractor: item => item.id,
-  style: {},
+  style: {}
 };
 
 export default withTheme(FlatListData);
