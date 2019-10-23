@@ -4,11 +4,9 @@
     "slug": "cardapiodigital",
     "privacy": "public",
     "sdkVersion": "34.0.0",
-    "platforms": [
-      "android"
-    ],
+    "platforms": ["android"],
     "version": "1.0.0",
-    "orientation": "landscape",
+    "orientation": "landscape", // landscape, portrait, default
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
@@ -18,9 +16,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -57,7 +53,7 @@
         "com.sec.android.provider.badge.permission.READ",
         "com.sec.android.provider.badge.permission.WRITE",
         "com.sonyericsson.home.permission.BROADCAST_BADGE"
-      ]  
+      ]
     }
   }
 }

@@ -1,6 +1,7 @@
 /* @flow */
 import firebase from "firebase";
 import moment from "moment";
+import { unescapeComponent } from "uri-js";
 
 const db = () => firebase.firestore();
 
@@ -19,13 +20,16 @@ const getListProdutos = () =>
     .get()
     .then(converterDados);
 
-const createPedido = () =>
+// status: aberto|solicitado|entregue
+const createPedido = userId =>
   db()
     .collection("pedidos")
     .add({
       userId: 1,
+      status: "aberto",
       data: moment().format("YYYY-MM-DD HH:mm:ss"),
-      produtos: []
+      produtos: [],
+      valor: 0.0
     })
     .then(docRef => docRef.id)
     .catch(error => {
@@ -39,12 +43,74 @@ const getPedido = pedidoId =>
     .get()
     .then(querySnapshot => querySnapshot.data());
 
-const getListProdutosPedido = pedidoId =>
+const getListPedido = (userId, action) =>
+  db()
+    .collection("pedidos")
+    .onSnapshot(querySnapshot => {
+      const pedidos = converterDados(querySnapshot.docs);
+      action(pedidos.filter(pedido => pedido.userId === userId));
+    });
+
+const updatePedido = (pedidoId, coluna, valor) =>
+  db()
+    .collection("pedidos")
+    .doc(pedidoId)
+    .update(coluna, valor);
+
+const getListProdutosPedido = (pedidoId, action) =>
+  db()
+    .collection("pedidos")
+    .doc(pedidoId)
+    .onSnapshot(querySnapshot => {
+      action(querySnapshot.data() ? querySnapshot.data().produtos : []);
+    });
+
+const addProdutoListaPedido = (pedidoId, produto) =>
   db()
     .collection("pedidos")
     .doc(pedidoId)
     .get()
-    .then(querySnapshot => querySnapshot.data().produtos);
+    .then(querySnapshot => {
+      const produtos = querySnapshot.data().produtos;
+      db()
+        .collection("pedidos")
+        .doc(pedidoId)
+        .update("produtos", [...produtos, produto]);
+    });
+
+const updateProdutoListaPedido = (pedidoId, index, newProduto) =>
+  db()
+    .collection("pedidos")
+    .doc(pedidoId)
+    .get()
+    .then(querySnapshot => {
+      const produtos = querySnapshot.data().produtos;
+      const newProdutos = produtos.map((pro, ind) => {
+        if (ind === index) {
+          return newProduto;
+        }
+        return pro;
+      });
+
+      db()
+        .collection("pedidos")
+        .doc(pedidoId)
+        .update("produtos", newProdutos);
+    });
+
+const removeProdutoListaPedido = (pedidoId, index) =>
+  db()
+    .collection("pedidos")
+    .doc(pedidoId)
+    .get()
+    .then(querySnapshot => {
+      const produtos = querySnapshot.data().produtos;
+      produtos.splice(index, 1);
+      db()
+        .collection("pedidos")
+        .doc(pedidoId)
+        .update("produtos", produtos);
+    });
 
 const getUsuario = usuarioId =>
   db()
@@ -72,7 +138,12 @@ const createUsuario = ({ id, nome, email, senha }) =>
 const api = {
   createPedido,
   getPedido,
+  getListPedido,
+  updatePedido,
   getListProdutosPedido,
+  addProdutoListaPedido,
+  updateProdutoListaPedido,
+  removeProdutoListaPedido,
   getListProdutos,
   findUsuario,
   getUsuario,

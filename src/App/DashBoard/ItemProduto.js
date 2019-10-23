@@ -11,9 +11,12 @@ import {
 } from "react-native-paper";
 
 import Money from "../../componentes/Money";
+import api from "../../utils/api";
+import { usePedidoId } from "../../../Provider";
 
 const ItemProduto = ({ theme, item }) => {
-  const oi = "oie";
+  const [pedidoId] = usePedidoId();
+
   return (
     <Card style={{ flex: 1, marginHorizontal: 15 }}>
       <Card.Cover
@@ -30,10 +33,16 @@ const ItemProduto = ({ theme, item }) => {
         )}
       />
       <Card.Content>
-        <Caption numberOfLines={3}>{item.descricao}</Caption>
+        <Paragraph numberOfLines={3}>{item.descricao}</Paragraph>
       </Card.Content>
       <Card.Actions>
-        <Button>Adicionar</Button>
+        <Button
+          onPress={() => {
+            api.addProdutoListaPedido(pedidoId, { ...item, quantidade: 1 });
+          }}
+        >
+          Adicionar
+        </Button>
       </Card.Actions>
     </Card>
   );

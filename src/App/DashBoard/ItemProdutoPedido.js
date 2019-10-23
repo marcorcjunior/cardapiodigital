@@ -14,9 +14,11 @@ import {
 import Money from "../../componentes/Money";
 import { Image, View } from "react-native";
 import { Text } from "react-native-paper";
+import api from "../../utils/api";
+import { usePedidoId } from "../../../Provider";
 
-const ItemProdutoPedido = ({ theme, item }) => {
-  const oi = "oie";
+const ItemProdutoPedido = ({ theme, item, index }) => {
+  const [pedidoId] = usePedidoId();
   return (
     <Card style={{ flex: 1, marginHorizontal: 5 }}>
       <Card.Title
@@ -24,26 +26,42 @@ const ItemProdutoPedido = ({ theme, item }) => {
         subtitle={item.descricao}
         right={props => (
           <Title style={{ marginHorizontal: 15 }}>
-            <Money>{item.preco}</Money>
+            <Money>{item.quantidade * item.preco}</Money>
           </Title>
         )}
       />
       <Card.Actions>
         <View style={{ flexDirection: "row" }}>
           <IconButton
-            icon="remove"
-            size={20}
-            color="white"
-            style={{ backgroundColor: theme.colors.erro, borderRadius: 20 }}
+            icon={item.quantidade === 1 ? "delete" : "remove"}
+            size={27}
+            color={theme.colors.erro}
+            onPress={() => {
+              if (item.quantidade > 1) {
+                api.updateProdutoListaPedido(pedidoId, index, {
+                  ...item,
+                  quantidade: item.quantidade - 1
+                });
+              } else {
+                api.removeProdutoListaPedido(pedidoId, index);
+              }
+            }}
           />
           <View style={{ marginTop: 5 }}>
-            <Title>1</Title>
+            <Title>{item.quantidade || 1}</Title>
           </View>
           <IconButton
             icon="add"
-            size={20}
-            color="white"
-            style={{ backgroundColor: theme.colors.sucesso, borderRadius: 20 }}
+            size={27}
+            color={theme.colors.sucesso}
+            onPress={() => {
+              if (item.quantidade <= 30) {
+                api.updateProdutoListaPedido(pedidoId, index, {
+                  ...item,
+                  quantidade: item.quantidade + 1
+                });
+              }
+            }}
           />
         </View>
       </Card.Actions>

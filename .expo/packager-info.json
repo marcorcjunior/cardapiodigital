@@ -2,8 +2,8 @@
   "expoServerPort": null,
   "packagerPort": null,
   "packagerPid": null,
-  "expoServerNgrokUrl": null,
-  "packagerNgrokUrl": null,
-  "ngrokPid": null,
+  "expoServerNgrokUrl": "https://y8-b65.marc1.cardapiodigital.exp.direct",
+  "packagerNgrokUrl": "https://packager.y8-b65.marc1.cardapiodigital.exp.direct",
+  "ngrokPid": 21091,
   "devToolsPort": 19002
 }

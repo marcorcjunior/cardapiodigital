@@ -13,6 +13,11 @@ import Loading from "./Loading";
 import NotFound from "./NotFound";
 
 type Props = {
+  notFoundTitle: String,
+  notFoundSubTitle: String,
+  notFoundImage: any,
+  notImpar: Boolean,
+  divider: Boolean,
   data: Array<Object>,
   onRefresh?: Function,
   renderItem: Function,
@@ -22,6 +27,11 @@ type Props = {
 
 const FlatListData = ({
   theme,
+  notImpar,
+  divider,
+  notFoundTitle,
+  notFoundSubTitle,
+  notFoundImage,
   data,
   loading,
   onRefresh,
@@ -43,6 +53,10 @@ const FlatListData = ({
     return <Loading />;
   }
 
+  if (notImpar && data.length % 2 !== 0) {
+    data.push({ id: null });
+  }
+
   return (
     <FlatList
       {...props}
@@ -53,8 +67,20 @@ const FlatListData = ({
         paddingTop: 10,
         paddingHorizontal: 10
       }}
-      ItemSeparatorComponent={() => <Divider style={{ marginVertical: 4 }} />}
-      ListEmptyComponent={() => <NotFound />}
+      ItemSeparatorComponent={() =>
+        divider ? (
+          <Divider style={{ marginVertical: 4 }} />
+        ) : (
+          <View style={{ marginVertical: 4 }} />
+        )
+      }
+      ListEmptyComponent={() => (
+        <NotFound
+          title={notFoundTitle}
+          subtitle={notFoundSubTitle}
+          image={notFoundImage}
+        />
+      )}
       refreshControl={
         <RefreshControl
           colors={[theme.colors.primary, theme.colors.accent]}
@@ -91,6 +117,11 @@ const FlatListData = ({
 
 FlatListData.defaultProps = {
   data: [],
+  notImpar: false,
+  divider: true,
+  notFoundTitle: null,
+  notFoundSubTitle: null,
+  notFoundImage: null,
   loading: false,
   onRefresh: () => {},
   onLoadMore: () => {},

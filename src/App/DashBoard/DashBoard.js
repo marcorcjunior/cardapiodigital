@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 // import firestore from '@react-native-firebase/firestore';
 import { StyleSheet, View } from "react-native";
-import { withTheme, Title, Headline, Button } from "react-native-paper";
+import {
+  withTheme,
+  Title,
+  Headline,
+  Button,
+  Paragraph,
+  Card
+} from "react-native-paper";
 
 import FlatListData from "../../componentes/FlatListData";
 import Container from "../../componentes/Container";
@@ -11,7 +18,8 @@ import Layout from "../../componentes/Layout";
 import api from "../../utils/api";
 import ItemProduto from "./ItemProduto";
 import ItemProdutoPedido from "./ItemProdutoPedido";
-import { usePedidoId } from "../../../Provider";
+import { usePedidoId, setPedidoIdLocal } from "../../../Provider";
+import { dinheiro } from "../../utils/formatarDinheiro";
 
 const styles = StyleSheet.create({
   dot: {
@@ -29,26 +37,29 @@ const styles = StyleSheet.create({
 });
 
 const DashBoard = ({ theme }) => {
-  const [pedidoId] = usePedidoId();
+  const [pedidoId, setPedidoId] = usePedidoId();
+  const [valorPedido, setValorPedido] = useState(0.0);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [carrinho, setCarrinho] = useState([]);
 
   useEffect(() => {
     console.warn("pedidoId", pedidoId);
-    api.getListProdutos().then(setData);
-    // api.getListProdutosPedido(pedidoId).then(setCarrinho);
+    if (pedidoId) {
+      api.getListProdutos().then(setData);
+      api.getListProdutosPedido(pedidoId, produtosCarrinho => {
+        setCarrinho(produtosCarrinho);
+        setValorPedido(
+          produtosCarrinho.reduce(
+            (total, currentValue) =>
+              total + currentValue.quantidade * currentValue.preco,
+            0.0
+          )
+        );
+      });
+    }
     setLoading(false);
-  }, [loading]);
-
-  // useEffect(() => {
-  //   const documentSnapshot = firestore()
-  //     .collection('users')
-  //     .doc('alovelace')
-  //     .get();
-
-  //   console.log('User data', documentSnapshot.data());
-  // }, []);
+  }, [loading, pedidoId]);
 
   return (
     <Layout
@@ -58,12 +69,22 @@ const DashBoard = ({ theme }) => {
     >
       <Container style={{ flexDirection: "row", marginVertical: 16 }}>
         <View style={{ flex: 1 }}>
+          <View style={{ marginHorizontal: 17 }}>
+            <Headline>Cardapio</Headline>
+          </View>
           <FlatListData
+            notImpar
+            divider={false}
             numColumns={2}
             data={data}
             loading={loading}
             keyExtractor={item => item.id}
-            renderItem={({ item }) => <ItemProduto item={item} />}
+            renderItem={({ item }) => {
+              if (item.id !== null) {
+                return <ItemProduto item={item} />;
+              }
+              return <Container style={{ marginHorizontal: 15 }} />;
+            }}
             onRefresh={() => {
               setLoading(true);
             }}
@@ -71,7 +92,7 @@ const DashBoard = ({ theme }) => {
           />
         </View>
         <View style={{ flex: 0.4 }}>
-          <View styel={{ marginHorizontal: 10 }}>
+          <View style={{ marginHorizontal: 17 }}>
             <Headline>Itens do carrinho</Headline>
           </View>
           <FlatListData
@@ -79,14 +100,29 @@ const DashBoard = ({ theme }) => {
             data={carrinho}
             loading={loading}
             keyExtractor={item => item.id}
-            renderItem={({ item }) => <ItemProdutoPedido item={item} />}
+            renderItem={({ item, index }) => (
+              <ItemProdutoPedido item={item} index={index} />
+            )}
             onRefresh={() => {
               setLoading(true);
             }}
             onLoadMore={() => {}}
+            notFoundTitle="Carrinho vazio"
+            notFoundSubTitle="Adicione agora seu primeiro produto!"
           />
-          <Button mode="outlined" style={{ marginRight: 22 }}>
-            Enviar pedido
+          <Button
+            mode="outlined"
+            style={{ marginHorizontal: 17 }}
+            onPress={() => {
+              Promise.all([
+                api.updatePedido(pedidoId, "status", "solicitado"),
+                api.updatePedido(pedidoId, "valor", valorPedido)
+              ]).then(() =>
+                setPedidoIdLocal(null).then(() => setPedidoId(null))
+              );
+            }}
+          >
+            Enviar pedido ({dinheiro(valorPedido)})
           </Button>
         </View>
       </Container>

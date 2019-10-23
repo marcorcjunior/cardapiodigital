@@ -1,56 +1,50 @@
 /* @flow */
 
-import React, { useState } from 'react';
-import { TabView } from 'react-native-tab-view';
-import { withTheme, Appbar, Title } from 'react-native-paper';
+import React, { useState, useEffect } from "react";
+import { View } from "react-native";
+import { withTheme, Appbar, Title, Text, Card } from "react-native-paper";
+import { TabView } from "react-native-tab-view";
 
-import Layout from '../../componentes/Layout';
-import DateSelectorPeriod from '../../componentes/DateSelectorPeriod';
-import LocalTabBar from '../../componentes/LocalTabBar';
-import Loading from '../../componentes/Loading';
-import { View } from 'react-native';
+import api from "../../utils/api";
+import Layout from "../../componentes/Layout";
+import Container from "../../componentes/Container";
+import Loading from "../../componentes/Loading";
+import FlatListData from "../../componentes/FlatListData";
+import ItemPedido from "./ItemPedido";
 
 const Pedido = ({ theme }) => {
-    const [period, setPeriod] = useState({});
-    const [openDataSelect, setOpenDataSelect] = useState(false);
-    const [index, setIndex] = useState(0);
-    const [routes, setRoutes] = useState([
-        { key: 'pedido', title: 'Em andamento' },
-        { key: 'pedidos', title: 'Pedidos efetuados' },
-    ]);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
 
-    const dateSelectorOpen = (
-        <Appbar.Action
-            icon="date-range"
-            onPress={() => setOpenDataSelect(true)}
-        />
-    );
+  useEffect(() => {
+    // console.warn("pedidoId", pedidoId);
+    //   api.getListProdutos().then(setData);
+    api.getListPedido(1, setData);
+    setLoading(false);
+  }, [loading]);
 
-    return (
-        <Layout title="Pedidos" subtitle="Detalhes dos pedidos" actions={[dateSelectorOpen]}>
-            <TabView
-                lazy
-                navigationState={{ index, routes }}
-                onIndexChange={ind => setIndex(ind)}
-                renderTabBar={props => <LocalTabBar {...props} />}
-                renderScene={({ route, jumpTo }) => (
-                    <View
-                        jumpTo={jumpTo}
-                        route={route}
-                        period={period}
-                    >
-                        <Title>{route.title}</Title>
-                    </View>
-                )}
-                renderLazyPlaceholder={() => <Loading />}
-            />
-            <DateSelectorPeriod
-                open={openDataSelect}
-                onClose={isOpen => setOpenDataSelect(isOpen)}
-                onDone={dates => console.warn('oie')}
-            />
-        </Layout>
-    );
+  return (
+    <Layout title="Pedidos" subtitle="Lista dos pedidos efetuados">
+      <FlatListData
+        notImpar
+        divider={false}
+        numColumns={2}
+        data={data}
+        loading={loading}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => {
+          if (item.id !== null) {
+            return <ItemPedido item={item} />;
+          }
+          return <Container style={{ marginHorizontal: 15 }} />;
+        }}
+        onRefresh={() => {
+          setLoading(true);
+        }}
+        onLoadMore={() => {}}
+      />
+    </Layout>
+  );
 };
 
 export default withTheme(Pedido);

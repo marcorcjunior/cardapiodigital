@@ -36,8 +36,8 @@ export const GlobalContext = createContext<GlobalContextType>({
 const getThemeLocal = () => storage.getItem("theme");
 const setThemeLocal = item => storage.setItem("theme", item);
 
-const getPedidoIdLocal = () => storage.getItem("pedidoId");
-const setPedidoIdLocal = item => storage.setItem("pedidoId", item);
+export const getPedidoIdLocal = () => storage.getItem("pedidoId");
+export const setPedidoIdLocal = item => storage.setItem("pedidoId", item);
 
 const PaperStatusBar = ({ theme }) => (
   <>
@@ -65,6 +65,7 @@ type User = {
 export const Provider = ({ children }: { children: Node }) => {
   const [visible, setVisible] = useState(false);
   const [pedidoId, setPedidoId] = useState<Number | null>(null);
+  const [pedido, setPedido] = useState<Object | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [theme, setTheme] = useState<Theme>("light");
   const localTheme = theme === "light" ? themeLigh : themeDark;
@@ -79,21 +80,31 @@ export const Provider = ({ children }: { children: Node }) => {
     });
   }, []);
 
+  // useEffect(() => {
+  //   // setPedidoIdLocal(null);
+  //   setPedidoId("oApi6i01zqZOQKJENcE0");
+  // }, []);
+
   useEffect(() => {
-    // setPedidoIdLocal(null);
-    getPedidoIdLocal().then(item => {
-      console.warn("item", item);
-      api.getPedido(item).then(pedido => console.warn("pedido", pedido));
-      if (!item) {
-        api.createPedido().then(newPedidoId => {
-          setPedidoIdLocal(newPedidoId);
-          setPedidoId(newPedidoId);
-        });
+    getPedidoIdLocal().then(async idPedidoLocal => {
+      let isExistePedido = false;
+      if (idPedidoLocal !== null) {
+        isExistePedido = await api.getPedido(idPedidoLocal);
+      }
+
+      if (idPedidoLocal && isExistePedido) {
+        setPedidoId(idPedidoLocal);
+        api.getPedido(idPedidoLocal).then(setPedido);
         return;
       }
-      setPedidoId(item);
+
+      api.createPedido().then(newPedidoId => {
+        setPedidoIdLocal(newPedidoId);
+        setPedidoId(newPedidoId);
+        api.getPedido(newPedidoId).then(setPedido);
+      });
     });
-  }, []);
+  }, [pedidoId]);
 
   const valuesProvider = {
     theme,
@@ -101,7 +112,9 @@ export const Provider = ({ children }: { children: Node }) => {
     user,
     setUser,
     pedidoId,
-    setPedidoId
+    setPedidoId,
+    pedido,
+    setPedido
   };
 
   return (
@@ -142,4 +155,9 @@ export const useUser = () => {
 export const usePedidoId = () => {
   const { pedidoId, setPedidoId } = useContext(GlobalContext);
   return [pedidoId, setPedidoId];
+};
+
+export const usePedido = () => {
+  const { pedido, setPedido } = useContext(GlobalContext);
+  return [pedido, setPedido];
 };
