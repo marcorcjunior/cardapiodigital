@@ -113,13 +113,13 @@ const Perfil = ({ theme }) => {
             <Paragraph>{email}</Paragraph>
           </View>
           <List.Section>
-            <List.Item
+            {/* <List.Item
               title="Termos de uso"
               left={props => <List.Icon {...props} icon="gavel" />}
               right={props => <List.Icon {...props} icon="chevron-right" />}
               onPress={() => Actions.termosUso({})}
             />
-            <Divider />
+            <Divider /> */}
             <List.Item
               title="Sair"
               left={props => <List.Icon {...props} icon="exit-to-app" />}

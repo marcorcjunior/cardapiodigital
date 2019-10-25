@@ -26,14 +26,14 @@ const App = () => {
         <Scene key="root">
           <Scene key="login" component={Login} hideNavBar />
           <Scene key="main" component={Main} hideNavBar />
-          <Scene
+          {/* <Scene
             key="termosUso"
             title="Termos de uso"
             description=""
-            url="http://plom.com.br/termos-uso"
+            url=""
             component={WebPage}
             hideNavBar
-          />
+          /> */}
         </Scene>
       </Router>
     </Provider>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 // import firestore from '@react-native-firebase/firestore';
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Alert } from "react-native";
 import {
   withTheme,
   Title,
@@ -18,8 +18,9 @@ import Layout from "../../componentes/Layout";
 import api from "../../utils/api";
 import ItemProduto from "./ItemProduto";
 import ItemProdutoPedido from "./ItemProdutoPedido";
-import { usePedidoId, setPedidoIdLocal } from "../../../Provider";
+import { usePedidoId, setPedidoIdLocal, useUser } from "../../../Provider";
 import { dinheiro } from "../../utils/formatarDinheiro";
+import { Actions } from "react-native-router-flux";
 
 const styles = StyleSheet.create({
   dot: {
@@ -37,6 +38,7 @@ const styles = StyleSheet.create({
 });
 
 const DashBoard = ({ theme }) => {
+  const [user] = useUser();
   const [pedidoId, setPedidoId] = usePedidoId();
   const [valorPedido, setValorPedido] = useState(0.0);
   const [loading, setLoading] = useState(false);
@@ -116,9 +118,29 @@ const DashBoard = ({ theme }) => {
               Promise.all([
                 api.updatePedido(pedidoId, "status", "solicitado"),
                 api.updatePedido(pedidoId, "valor", valorPedido)
-              ]).then(() =>
-                setPedidoIdLocal(null).then(() => setPedidoId(null))
-              );
+              ]).then(() => {
+                setPedidoIdLocal(null).then(() => setPedidoId(null));
+                Alert.alert(
+                  "Obrigado pela preferencia!",
+                  "Desejá fazer mais algum pedido ?",
+                  [
+                    {
+                      text: "Quero pedir mais",
+                      onPress: () => {
+                        api.updatePedido(pedidoId, "userId", user.id);
+                      }
+                    },
+                    {
+                      text: "Não obrigado",
+                      onPress: () => {
+                        Actions.pop();
+                      },
+                      style: "cancel"
+                    }
+                  ],
+                  { cancelable: false }
+                );
+              });
             }}
           >
             Enviar pedido ({dinheiro(valorPedido)})
