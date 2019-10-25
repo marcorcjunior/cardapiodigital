@@ -90,26 +90,29 @@ const Login = ({ theme }) => {
                       if (type === "success") {
                         const url = `https://graph.facebook.com/me?fields=name,email&access_token=${token}`;
                         axios.get(url).then(({ data: { id, name, email } }) => {
-                          api.findUsuario(id).then(isExistUser => {
-                            if (isExistUser) {
-                              setUserGlobal(isExistUser);
-                              api.updatePedido(pedidoId, "userId", id);
+                          api
+                            .findUsuario(id)
+                            .then(isExistUser => {
+                              if (isExistUser) {
+                                setUserGlobal(isExistUser);
+                                api.updatePedido(pedidoId, "userId", id);
+                                Actions.main({});
+                                return;
+                              }
+
+                              const newUser = {
+                                id,
+                                nome: name,
+                                email,
+                                senha: "cardapiodigital"
+                              };
+                              api.createUsuario(newUser);
+                              setUserGlobal(newUser);
+                              api.updatePedido(pedidoId, "userId", newUser.id);
                               Actions.main({});
                               return;
-                            }
-
-                            const newUser = {
-                              id,
-                              nome: name,
-                              email,
-                              senha: "cardapiodigital"
-                            };
-                            api.createUsuario(newUser);
-                            setUserGlobal(newUser);
-                            api.updatePedido(pedidoId, "userId", newUser.id);
-                            Actions.main({});
-                            return;
-                          });
+                            })
+                            .catch(erro => console.error(erro));
                         });
                       } else {
                         alert("Login fidelidade cancelado.");
@@ -132,15 +135,18 @@ const Login = ({ theme }) => {
                 icon="touch-app"
                 onPress={() => {
                   // szOwMCFF163FAfE5pTAu = CONVIDADO
-                  api.getUsuario("szOwMCFF163FAfE5pTAu").then(user => {
-                    setUserGlobal({ id: "szOwMCFF163FAfE5pTAu", ...user });
-                    api.updatePedido(
-                      pedidoId,
-                      "userId",
-                      "szOwMCFF163FAfE5pTAu"
-                    );
-                    Actions.main({});
-                  });
+                  api
+                    .getUsuario("szOwMCFF163FAfE5pTAu")
+                    .then(user => {
+                      setUserGlobal({ id: "szOwMCFF163FAfE5pTAu", ...user });
+                      api.updatePedido(
+                        pedidoId,
+                        "userId",
+                        "szOwMCFF163FAfE5pTAu"
+                      );
+                    })
+                    .catch(erro => console.error(erro));
+                  Actions.main({});
                 }}
               >
                 Convidado

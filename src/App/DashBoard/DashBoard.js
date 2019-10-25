@@ -37,6 +37,8 @@ const styles = StyleSheet.create({
   }
 });
 
+const arraysAreEqual = (ary1, ary2) => ary1.join("") == ary2.join("");
+
 const DashBoard = ({ theme }) => {
   const [user] = useUser();
   const [pedidoId, setPedidoId] = usePedidoId();
@@ -47,20 +49,27 @@ const DashBoard = ({ theme }) => {
 
   useEffect(() => {
     api.getListProdutos().then(setData);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
     if (pedidoId) {
       api.getListProdutosPedido(pedidoId, produtosCarrinho => {
-        setCarrinho(produtosCarrinho);
-        setValorPedido(
-          produtosCarrinho.reduce(
-            (total, currentValue) =>
-              total + currentValue.quantidade * currentValue.preco,
-            0.0
-          )
-        );
+        if (!arraysAreEqual(carrinho, produtosCarrinho)) {
+          setCarrinho(produtosCarrinho);
+          setValorPedido(
+            produtosCarrinho.reduce(
+              (total, currentValue) =>
+                total + currentValue.quantidade * currentValue.preco,
+              0.0
+            )
+          );
+        }
       });
     }
+
     setLoading(false);
-  }, [pedidoId]);
+  }, [loading, pedidoId]);
 
   return (
     <Layout
@@ -78,7 +87,7 @@ const DashBoard = ({ theme }) => {
             divider={false}
             numColumns={2}
             data={data}
-            loading={loading}
+            // loading={loading}
             keyExtractor={item => item.id}
             renderItem={({ item }) => {
               if (item.id !== null) {
@@ -87,7 +96,7 @@ const DashBoard = ({ theme }) => {
               return <Container style={{ marginHorizontal: 15 }} />;
             }}
             onRefresh={() => {
-              setLoading(true);
+              // setLoading(true);
             }}
             onLoadMore={() => {}}
           />

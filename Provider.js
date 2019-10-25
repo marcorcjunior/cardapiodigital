@@ -89,7 +89,7 @@ export const Provider = ({ children }: { children: Node }) => {
     // setPedidoIdLocal(null);
     getPedidoIdLocal().then(async idPedidoLocal => {
       let isExistePedido = false;
-      if (idPedidoLocal !== null) {
+      if (typeof idPedidoLocal !== "undefined" && idPedidoLocal !== null) {
         isExistePedido = await api.getPedido(idPedidoLocal);
       }
 
