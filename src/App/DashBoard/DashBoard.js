@@ -44,9 +44,8 @@ const DashBoard = ({ theme }) => {
   const [carrinho, setCarrinho] = useState([]);
 
   useEffect(() => {
-    console.warn("pedidoId", pedidoId);
+    api.getListProdutos().then(setData);
     if (pedidoId) {
-      api.getListProdutos().then(setData);
       api.getListProdutosPedido(pedidoId, produtosCarrinho => {
         setCarrinho(produtosCarrinho);
         setValorPedido(
@@ -59,7 +58,7 @@ const DashBoard = ({ theme }) => {
       });
     }
     setLoading(false);
-  }, [loading, pedidoId]);
+  }, [pedidoId]);
 
   return (
     <Layout

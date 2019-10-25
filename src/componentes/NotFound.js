@@ -25,7 +25,7 @@ const NotFound = ({ theme, title, subtitle, image, children }: Props) => (
   >
     <View style={{ flex: 1 }} />
     <Image
-      source={image}
+      source={notfound}
       resizeMode="contain"
       style={{ width, height: height / 3 }}
     />

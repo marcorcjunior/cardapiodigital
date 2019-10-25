@@ -124,7 +124,10 @@ const Perfil = ({ theme }) => {
               title="Sair"
               left={props => <List.Icon {...props} icon="exit-to-app" />}
               right={props => <List.Icon {...props} icon="chevron-right" />}
-              onPress={() => setUser(null)}
+              onPress={() => {
+                setUser(null);
+                Actions.pop();
+              }}
             />
           </List.Section>
         </Container>

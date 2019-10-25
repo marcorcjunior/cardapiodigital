@@ -86,6 +86,7 @@ export const Provider = ({ children }: { children: Node }) => {
   // }, []);
 
   useEffect(() => {
+    // setPedidoIdLocal(null);
     getPedidoIdLocal().then(async idPedidoLocal => {
       let isExistePedido = false;
       if (idPedidoLocal !== null) {

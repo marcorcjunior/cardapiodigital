@@ -11,15 +11,17 @@ import Container from "../../componentes/Container";
 import Loading from "../../componentes/Loading";
 import FlatListData from "../../componentes/FlatListData";
 import ItemPedido from "./ItemPedido";
+import { useUser } from "../../../Provider";
 
 const Pedido = ({ theme }) => {
+  const [user, setUser] = useUser();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    // console.warn("pedidoId", pedidoId);
-    //   api.getListProdutos().then(setData);
-    api.getListPedido(1, setData);
+    api.getListPedido(user.id, pedidos =>
+      setData(pedidos.filter(pedido => pedido.status !== "aberto"))
+    );
     setLoading(false);
   }, [loading]);
 
@@ -42,6 +44,7 @@ const Pedido = ({ theme }) => {
           setLoading(true);
         }}
         onLoadMore={() => {}}
+        style={{ marginVertical: 16 }}
       />
     </Layout>
   );

@@ -27,7 +27,7 @@ import cadapiodigital from "../../../images/cadapiodigital.png";
 import { Actions } from "react-native-router-flux";
 import axios from "axios";
 import api from "../../utils/api";
-import { useUser } from "../../../Provider";
+import { useUser, usePedidoId } from "../../../Provider";
 
 const styles = StyleSheet.create({
   container: {
@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
 });
 
 const Login = ({ theme }) => {
+  const [pedidoId] = usePedidoId();
   const [userGlobal, setUserGlobal] = useUser();
 
   useEffect(() => {
@@ -92,6 +93,7 @@ const Login = ({ theme }) => {
                           api.findUsuario(id).then(isExistUser => {
                             if (isExistUser) {
                               setUserGlobal(isExistUser);
+                              api.updatePedido(pedidoId, "userId", id);
                               Actions.main({});
                               return;
                             }
@@ -104,6 +106,7 @@ const Login = ({ theme }) => {
                             };
                             api.createUsuario(newUser);
                             setUserGlobal(newUser);
+                            api.updatePedido(pedidoId, "userId", newUser.id);
                             Actions.main({});
                             return;
                           });
@@ -129,8 +132,13 @@ const Login = ({ theme }) => {
                 icon="touch-app"
                 onPress={() => {
                   // szOwMCFF163FAfE5pTAu = CONVIDADO
-                  api.getUsuario("stlPZyxEXHLvzKbNfBzc").then(user => {
-                    setUserGlobal(user);
+                  api.getUsuario("szOwMCFF163FAfE5pTAu").then(user => {
+                    setUserGlobal({ id: "szOwMCFF163FAfE5pTAu", ...user });
+                    api.updatePedido(
+                      pedidoId,
+                      "userId",
+                      "szOwMCFF163FAfE5pTAu"
+                    );
                     Actions.main({});
                   });
                 }}

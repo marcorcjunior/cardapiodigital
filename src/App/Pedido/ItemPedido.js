@@ -26,7 +26,6 @@ const ItemPedido = ({ theme, item }) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    console.warn("item.produtos.length", item.produtos.length);
     if (item.produtos.length) {
       setData(item.produtos);
     }
@@ -49,12 +48,12 @@ const ItemPedido = ({ theme, item }) => {
       />
       <Card.Content>
         <DataTable>
-          <DataTable.Header>
-            <DataTable.Title>Produto</DataTable.Title>
-            <DataTable.Title numeric>Qtd.</DataTable.Title>
-            <DataTable.Title numeric>Valor</DataTable.Title>
-          </DataTable.Header>
           <ScrollView style={{ height: 128 }}>
+            <DataTable.Header>
+              <DataTable.Title>Produto</DataTable.Title>
+              <DataTable.Title numeric>Qtd.</DataTable.Title>
+              <DataTable.Title numeric>Valor</DataTable.Title>
+            </DataTable.Header>
             {data.map(produto => (
               <DataTable.Row>
                 <DataTable.Cell>{produto.nome}</DataTable.Cell>
