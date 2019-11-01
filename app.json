@@ -6,7 +6,7 @@
     "sdkVersion": "34.0.0",
     "platforms": ["android"],
     "version": "1.0.0",
-    "orientation": "landscape", // landscape, portrait, default
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",

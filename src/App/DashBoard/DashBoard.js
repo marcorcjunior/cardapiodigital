@@ -10,6 +10,8 @@ import {
   Card
 } from "react-native-paper";
 
+import { ScreenOrientation } from "expo";
+import Device from "react-native-device-detection";
 import FlatListData from "../../componentes/FlatListData";
 import Container from "../../componentes/Container";
 import DateSelector from "../../componentes/DateSelector";
@@ -21,6 +23,7 @@ import ItemProdutoPedido from "./ItemProdutoPedido";
 import { usePedidoId, setPedidoIdLocal, useUser } from "../../../Provider";
 import { dinheiro } from "../../utils/formatarDinheiro";
 import { Actions } from "react-native-router-flux";
+import { STATUS_PEDIDOS } from "../../utils/constantes";
 
 const styles = StyleSheet.create({
   dot: {
@@ -43,14 +46,22 @@ const DashBoard = ({ theme }) => {
   const [user] = useUser();
   const [pedidoId, setPedidoId] = usePedidoId();
   const [valorPedido, setValorPedido] = useState(0.0);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [carrinho, setCarrinho] = useState([]);
 
   useEffect(() => {
-    api.getListProdutos().then(setData);
+    ScreenOrientation.getOrientationAsync().then(valor => console.warn(valor));
+    api.getListProdutos().then(produtos => {
+      if (search) {
+        setData(produtos.filter(produto => !produto.nome.indexOf(search)));
+        return;
+      }
+      setData(produtos);
+    });
     setLoading(false);
-  }, []);
+  }, [search]);
 
   useEffect(() => {
     if (pedidoId) {
@@ -76,6 +87,7 @@ const DashBoard = ({ theme }) => {
       actionSearch
       title="Cardapio"
       subtitle="Lista de produtos disponiveis."
+      onSearchData={setSearch}
     >
       <Container style={{ flexDirection: "row", marginVertical: 16 }}>
         <View style={{ flex: 1 }}>
@@ -85,7 +97,7 @@ const DashBoard = ({ theme }) => {
           <FlatListData
             notImpar
             divider={false}
-            numColumns={2}
+            numColumns={Device.isTablet ? 2 : 1}
             data={data}
             // loading={loading}
             keyExtractor={item => item.id}
@@ -101,7 +113,7 @@ const DashBoard = ({ theme }) => {
             onLoadMore={() => {}}
           />
         </View>
-        <View style={{ flex: 0.4 }}>
+        <View style={{ flex: Device.isTablet ? 0.4 : 0.7 }}>
           <View style={{ marginHorizontal: 17 }}>
             <Headline>Itens do carrinho</Headline>
           </View>
@@ -125,7 +137,7 @@ const DashBoard = ({ theme }) => {
             style={{ marginHorizontal: 17 }}
             onPress={() => {
               Promise.all([
-                api.updatePedido(pedidoId, "status", "solicitado"),
+                api.updatePedido(pedidoId, "status", STATUS_PEDIDOS.SOLICITADO),
                 api.updatePedido(pedidoId, "valor", valorPedido)
               ]).then(() => {
                 setPedidoIdLocal(null).then(() => setPedidoId(null));
@@ -136,7 +148,7 @@ const DashBoard = ({ theme }) => {
                     {
                       text: "Quero pedir mais",
                       onPress: () => {
-                        api.updatePedido(pedidoId, "userId", user.id);
+                        api.updatePedido(pedidoId, "userId", user.uid);
                       }
                     },
                     {

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import { withTheme, Appbar, Title, Text, Card } from "react-native-paper";
 import { TabView } from "react-native-tab-view";
+import Device from "react-native-device-detection";
 
 import api from "../../utils/api";
 import Layout from "../../componentes/Layout";
@@ -19,7 +20,7 @@ const Pedido = ({ theme }) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    api.getListPedido(user.id, pedidos =>
+    api.getListPedido(user.uid, pedidos =>
       setData(pedidos.filter(pedido => pedido.status !== "aberto"))
     );
     setLoading(false);
@@ -30,7 +31,7 @@ const Pedido = ({ theme }) => {
       <FlatListData
         notImpar
         divider={false}
-        numColumns={2}
+        numColumns={Device.isTablet ? 2 : 1}
         data={data}
         loading={loading}
         keyExtractor={item => item.id}

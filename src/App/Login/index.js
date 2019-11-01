@@ -19,6 +19,7 @@ import {
 } from "react-native-paper";
 
 import firebase from "firebase";
+import Device from "react-native-device-detection";
 
 import Container from "../../componentes/Container";
 
@@ -62,7 +63,12 @@ const Login = ({ theme }) => {
         blurRadius={1}
       >
         <Container />
-        <Card style={{ width: "45%", heigth: "45%" }}>
+        <Card
+          style={{
+            width: Device.isTablet ? "45%" : "90%",
+            heigth: Device.isTablet ? "45%" : "90%"
+          }}
+        >
           <Card.Content>
             <View style={{ alignContent: "center", alignItems: "center" }}>
               <Image
@@ -93,23 +99,33 @@ const Login = ({ theme }) => {
                           api
                             .findUsuario(id)
                             .then(isExistUser => {
+                              console.warn(isExistUser);
                               if (isExistUser) {
                                 setUserGlobal(isExistUser);
-                                api.updatePedido(pedidoId, "userId", id);
+                                api.updatePedido(
+                                  pedidoId,
+                                  "userId",
+                                  isExistUser.uid
+                                );
                                 Actions.main({});
                                 return;
                               }
 
                               const newUser = {
+                                uid: null,
                                 id,
                                 nome: name,
                                 email,
                                 senha: "cardapiodigital"
                               };
-                              api.createUsuario(newUser);
-                              setUserGlobal(newUser);
-                              api.updatePedido(pedidoId, "userId", newUser.id);
-                              Actions.main({});
+                              
+                              api.createUsuario(newUser).then(uid => {
+                                newUser.uid = uid;
+                                api.updateUsuario(uid, 'uid', uid);
+                                setUserGlobal(newUser);
+                                api.updatePedido(pedidoId, "userId", newUser.uid);
+                                Actions.main({});  
+                              });
                               return;
                             })
                             .catch(erro => console.error(erro));
@@ -129,20 +145,19 @@ const Login = ({ theme }) => {
               <View style={{ marginTop: 8 }} />
               <Paragraph>ou</Paragraph>
               <View style={{ marginBottom: 8 }} />
-
               <Button
                 mode="outlined"
                 icon="touch-app"
                 onPress={() => {
                   // szOwMCFF163FAfE5pTAu = CONVIDADO
                   api
-                    .getUsuario("szOwMCFF163FAfE5pTAu")
+                    .getUsuario("d4q0b9l7Zu4D1EJRLfRB")
                     .then(user => {
-                      setUserGlobal({ id: "szOwMCFF163FAfE5pTAu", ...user });
+                      setUserGlobal({ id: "d4q0b9l7Zu4D1EJRLfRB", ...user });
                       api.updatePedido(
                         pedidoId,
                         "userId",
-                        "szOwMCFF163FAfE5pTAu"
+                        "d4q0b9l7Zu4D1EJRLfRB"
                       );
                     })
                     .catch(erro => console.error(erro));

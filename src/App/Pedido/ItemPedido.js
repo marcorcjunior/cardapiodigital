@@ -14,11 +14,13 @@ import {
   DataTable
 } from "react-native-paper";
 import moment from "moment";
+import Device from "react-native-device-detection";
 
 import api from "../../utils/api";
 import { usePedidoId } from "../../../Provider";
 import Money from "../../componentes/Money";
 import FlatListData from "../../componentes/FlatListData";
+import { statusPedidos } from "../../utils/constantes";
 
 const ItemPedido = ({ theme, item }) => {
   const [pedidoId] = usePedidoId();
@@ -31,6 +33,8 @@ const ItemPedido = ({ theme, item }) => {
     }
   }, [item]);
 
+  const statusLocal = statusPedidos[item.status];
+
   return (
     <Card style={{ flex: 1, marginHorizontal: 15 }}>
       <Card.Title
@@ -39,16 +43,16 @@ const ItemPedido = ({ theme, item }) => {
         right={props => (
           <Chip
             mode="outlined"
-            selectedColor={theme.colors.primary}
-            style={{ marginHorizontal: 16 }}
+            style={{ backgroundColor: statusLocal.cor, marginHorizontal: 16 }}
+            textStyle={{ color: theme.colors.background }}
           >
-            {item.status}
+            {statusLocal.descricao}
           </Chip>
         )}
       />
       <Card.Content>
         <DataTable>
-          <ScrollView style={{ height: 128 }}>
+          <ScrollView style={Device.isTablet ? { height: 128 } : {}}>
             <DataTable.Header>
               <DataTable.Title>Produto</DataTable.Title>
               <DataTable.Title numeric>Qtd.</DataTable.Title>

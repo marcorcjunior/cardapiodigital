@@ -9,6 +9,7 @@ import {
   Title,
   Caption
 } from "react-native-paper";
+import Device from "react-native-device-detection";
 
 import Money from "../../componentes/Money";
 import api from "../../utils/api";
@@ -19,11 +20,13 @@ const ItemProduto = ({ theme, item }) => {
 
   return (
     <Card style={{ flex: 1, marginHorizontal: 15 }}>
-      <Card.Cover
-        resizeMode="center"
-        source={{ uri: item.image }}
-        style={{ resizeMode: "center" }}
-      />
+      {Device.isTablet ? (
+        <Card.Cover
+          resizeMode="center"
+          source={{ uri: item.image }}
+          style={{ resizeMode: "center" }}
+        />
+      ) : null}
       <Card.Title
         title={item.nome}
         right={props => (

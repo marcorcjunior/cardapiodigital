@@ -5851,6 +5851,16 @@ react-native-country-picker-modal@^1.6.0:
     prop-types "15.7.2"
     typedoc "0.15.0"
 
+react-native-device-detection@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-device-detection/-/react-native-device-detection-0.2.0.tgz#4a74367b147b173b249a009592401c93f9915797"
+  integrity sha512-F+AD2m2gyrBkH0nB00xGB7+31PEJE3fsknh7K7ohLmp99OGj5Cw+tr/K3aVWgp8bP5epVOhAXwylnAod0DxEGw==
+
+react-native-device-info@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-5.0.1.tgz#e941424f9ab18688fb343dc1542b2cfaaabb330a"
+  integrity sha512-wK1D+kpgDW4J4KipOblU8kKtqU090YUWWydvb4r530BlUqtmU5l/Prq46ej6lYuagsQnoOurrBn+nNSWltwjwg==
+
 react-native-dismiss-keyboard@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-native-dismiss-keyboard/-/react-native-dismiss-keyboard-1.0.0.tgz#32886242b3f2317e121f3aeb9b0a585e2b879b49"

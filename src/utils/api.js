@@ -20,7 +20,6 @@ const getListProdutos = () =>
     .get()
     .then(converterDados);
 
-// status: aberto|solicitado|entregue
 const createPedido = userId =>
   db()
     .collection("pedidos")
@@ -48,7 +47,14 @@ const getListPedido = (userId, action) =>
     .collection("pedidos")
     .onSnapshot(querySnapshot => {
       const pedidos = converterDados(querySnapshot.docs);
-      action(pedidos.filter(pedido => pedido.userId === userId));
+      action(
+        pedidos
+          .filter(pedido => pedido.userId === userId)
+          .sort(
+            (pedido1, pedido2) =>
+              moment(pedido1).unix() > moment(pedido2).unix()
+          )
+      );
     });
 
 const updatePedido = (pedidoId, coluna, valor) =>
@@ -119,21 +125,28 @@ const getUsuario = usuarioId =>
     .get()
     .then(querySnapshot => querySnapshot.data());
 
-const findUsuario = id =>
+const findUsuario = uid =>
   db()
     .collection("usuarios")
     .get()
     .then(converterDados)
-    .then(users => users.find(user => user.id === id));
+    .then(users => users.find(user => user.uid === uid || user.id === uid));
 
-const createUsuario = ({ id, nome, email, senha }) =>
+const createUsuario = ({ uid, id, nome, email, senha }) =>
   db()
     .collection("usuarios")
-    .add({ id, nome, email, senha })
+    .add({ uid, id, nome, email, senha })
     .then(docRef => docRef.id)
     .catch(error => {
       console.error("Error adding document: ", error);
     });
+
+const updateUsuario = (userId, coluna, valor) =>
+  db()
+    .collection("usuarios")
+    .doc(userId)
+    .update(coluna, valor);
+
 
 const api = {
   createPedido,
@@ -147,7 +160,8 @@ const api = {
   getListProdutos,
   findUsuario,
   getUsuario,
-  createUsuario
+  createUsuario,
+  updateUsuario
 };
 
 export default api;
