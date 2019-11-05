@@ -28,7 +28,7 @@ import cadapiodigital from "../../../images/cadapiodigital.png";
 import { Actions } from "react-native-router-flux";
 import axios from "axios";
 import api from "../../utils/api";
-import { useUser, usePedidoId } from "../../../Provider";
+import { useUser, usePedidoId, useMesa } from "../../../Provider";
 
 const styles = StyleSheet.create({
   container: {
@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
 });
 
 const Login = ({ theme }) => {
+  const [mesa] = useMesa();
   const [pedidoId] = usePedidoId();
   const [userGlobal, setUserGlobal] = useUser();
 
@@ -84,89 +85,97 @@ const Login = ({ theme }) => {
 
               <View style={{ marginTop: 16, marginBottom: 16 }} />
 
-              <Button
-                mode="outlined"
-                icon="star"
-                onPress={async () => {
-                  const parameters = {
-                    permissions: ["public_profile", "email"]
-                  };
-                  logInWithReadPermissionsAsync("1229372737223999", parameters)
-                    .then(({ type, token }) => {
-                      if (type === "success") {
-                        const url = `https://graph.facebook.com/me?fields=name,email&access_token=${token}`;
-                        axios.get(url).then(({ data: { id, name, email } }) => {
-                          api
-                            .findUsuario(id)
-                            .then(isExistUser => {
-                              console.warn(isExistUser);
-                              if (isExistUser) {
-                                setUserGlobal(isExistUser);
-                                api.updatePedido(
-                                  pedidoId,
-                                  "userId",
-                                  isExistUser.uid
-                                );
-                                Actions.main({});
-                                return;
-                              }
+              <View style={{ flexDirection: "row" }}>
+                <Button
+                  mode="outlined"
+                  icon="star"
+                  onPress={async () => {
+                    const parameters = {
+                      permissions: ["public_profile", "email"]
+                    };
+                    logInWithReadPermissionsAsync(
+                      "1229372737223999",
+                      parameters
+                    )
+                      .then(({ type, token }) => {
+                        if (type === "success") {
+                          const url = `https://graph.facebook.com/me?fields=name,email&access_token=${token}`;
+                          axios
+                            .get(url)
+                            .then(({ data: { id, name, email } }) => {
+                              api
+                                .findUsuario(id)
+                                .then(isExistUser => {
+                                  console.warn(isExistUser);
+                                  if (isExistUser) {
+                                    setUserGlobal(isExistUser);
+                                    api.updatePedido(
+                                      pedidoId,
+                                      "userId",
+                                      isExistUser.uid
+                                    );
+                                    Actions.main({});
+                                    return;
+                                  }
 
-                              const newUser = {
-                                uid: null,
-                                id,
-                                nome: name,
-                                email,
-                                senha: "cardapiodigital"
-                              };
-                              
-                              api.createUsuario(newUser).then(uid => {
-                                newUser.uid = uid;
-                                api.updateUsuario(uid, 'uid', uid);
-                                setUserGlobal(newUser);
-                                api.updatePedido(pedidoId, "userId", newUser.uid);
-                                Actions.main({});  
-                              });
-                              return;
-                            })
-                            .catch(erro => console.error(erro));
-                        });
-                      } else {
-                        alert("Login fidelidade cancelado.");
-                      }
-                    })
-                    .catch(({ message }) => {
-                      alert(`Login fidelidade com error: ${message}`);
-                    });
-                }}
-              >
-                Fidelidade
-              </Button>
+                                  const newUser = {
+                                    uid: null,
+                                    id,
+                                    nome: name,
+                                    email,
+                                    senha: "cardapiodigital"
+                                  };
 
-              <View style={{ marginTop: 8 }} />
-              <Paragraph>ou</Paragraph>
-              <View style={{ marginBottom: 8 }} />
-              <Button
-                mode="outlined"
-                icon="touch-app"
-                onPress={() => {
-                  // szOwMCFF163FAfE5pTAu = CONVIDADO
-                  api
-                    .getUsuario("d4q0b9l7Zu4D1EJRLfRB")
-                    .then(user => {
-                      setUserGlobal({ id: "d4q0b9l7Zu4D1EJRLfRB", ...user });
-                      api.updatePedido(
-                        pedidoId,
-                        "userId",
-                        "d4q0b9l7Zu4D1EJRLfRB"
-                      );
-                    })
-                    .catch(erro => console.error(erro));
-                  Actions.main({});
-                }}
-              >
-                Convidado
-              </Button>
+                                  api.createUsuario(newUser).then(uid => {
+                                    newUser.uid = uid;
+                                    api.updateUsuario(uid, "uid", uid);
+                                    setUserGlobal(newUser);
+                                    api.updatePedido(
+                                      pedidoId,
+                                      "userId",
+                                      newUser.uid
+                                    );
+                                    Actions.main({});
+                                  });
+                                  return;
+                                })
+                                .catch(erro => console.error(erro));
+                            });
+                        } else {
+                          alert("Login fidelidade cancelado.");
+                        }
+                      })
+                      .catch(({ message }) => {
+                        alert(`Login fidelidade com error: ${message}`);
+                      });
+                  }}
+                >
+                  Fidelidade
+                </Button>
 
+                <View style={{ marginHorizontal: 16 }} />
+                <Button
+                  mode="outlined"
+                  icon="touch-app"
+                  onPress={() => {
+                    // szOwMCFF163FAfE5pTAu = CONVIDADO
+                    api
+                      .getUsuario("d4q0b9l7Zu4D1EJRLfRB")
+                      .then(user => {
+                        setUserGlobal({ id: "d4q0b9l7Zu4D1EJRLfRB", ...user });
+                        api.updatePedido(
+                          pedidoId,
+                          "userId",
+                          "d4q0b9l7Zu4D1EJRLfRB"
+                        );
+                      })
+                      .catch(erro => console.error(erro));
+                    Actions.main({});
+                  }}
+                >
+                  Convidado
+                </Button>
+              </View>
               <Image
                 resizeMode="contain"
                 source={cadapiodigital}
@@ -176,6 +185,11 @@ const Login = ({ theme }) => {
                   marginTop: 16
                 }}
               />
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <View style={{ flex: 1 }} />
+              <Paragraph>{`Mesa ${mesa ? mesa.numero : 1}`}</Paragraph>
+              <View style={{ flex: 1 }} />
             </View>
           </Card.Content>
         </Card>

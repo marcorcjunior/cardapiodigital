@@ -20,9 +20,6 @@
     "ios": {
       "supportsTablet": true
     },
-    "androidStatusBar": {
-      "backgroundColor": "#795548"
-    },
     "android": {
       "package": "tec.digital.cardapiodigital",
       "versionCode": 1,

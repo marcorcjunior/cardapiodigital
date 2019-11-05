@@ -38,8 +38,8 @@ const ItemPedido = ({ theme, item }) => {
   return (
     <Card style={{ flex: 1, marginHorizontal: 15 }}>
       <Card.Title
-        title={moment(item.data).format("DD MMMM YYYY HH:mm")}
-        subtitle={`Pedido #${item.id}`}
+        title={`Pedido #${item.id}`}
+        subtitle={moment(item.data).format("DD MMMM YYYY HH:mm")}
         right={props => (
           <Chip
             mode="outlined"
@@ -50,6 +50,7 @@ const ItemPedido = ({ theme, item }) => {
           </Chip>
         )}
       />
+      <List.Item title={item.mesa ? `Mesa ${item.mesa}` : "Balcão"} />
       <Card.Content>
         <DataTable>
           <ScrollView style={Device.isTablet ? { height: 128 } : {}}>

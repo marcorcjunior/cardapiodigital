@@ -27,7 +27,7 @@ const Pedido = ({ theme }) => {
   }, [loading]);
 
   return (
-    <Layout title="Pedidos" subtitle="Lista dos pedidos efetuados">
+    <Layout title="Pedidos efetuados" subtitle="Lista dos pedidos efetuados">
       <FlatListData
         notImpar
         divider={false}

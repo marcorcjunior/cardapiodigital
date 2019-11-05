@@ -11,7 +11,6 @@ import { Provider } from "./Provider";
 
 import Login from "./src/App/Login";
 import Main from "./src/App/DashBoard";
-import WebPage from "./src/App/WebPage";
 
 firebase.initializeApp({
   projectId: "cardapiodigital-2c940",
@@ -26,14 +25,6 @@ const App = () => {
         <Scene key="root">
           <Scene key="login" component={Login} hideNavBar />
           <Scene key="main" component={Main} hideNavBar />
-          {/* <Scene
-            key="termosUso"
-            title="Termos de uso"
-            description=""
-            url=""
-            component={WebPage}
-            hideNavBar
-          /> */}
         </Scene>
       </Router>
     </Provider>

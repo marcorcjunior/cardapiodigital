@@ -36,6 +36,9 @@ export const GlobalContext = createContext<GlobalContextType>({
 const getThemeLocal = () => storage.getItem("theme");
 const setThemeLocal = item => storage.setItem("theme", item);
 
+const getMesaLocal = () => storage.getItem("mesa");
+const setMesaLocal = item => storage.setItem("mesa", item);
+
 export const getPedidoIdLocal = () => storage.getItem("pedidoId");
 export const setPedidoIdLocal = item => storage.setItem("pedidoId", item);
 
@@ -67,6 +70,7 @@ export const Provider = ({ children }: { children: Node }) => {
   const [pedidoId, setPedidoId] = useState<Number | null>(null);
   const [pedido, setPedido] = useState<Object | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [mesa, setMesa] = useState<Number | null>(null);
   const [theme, setTheme] = useState<Theme>("light");
   const localTheme = theme === "light" ? themeLigh : themeDark;
 
@@ -80,10 +84,19 @@ export const Provider = ({ children }: { children: Node }) => {
     });
   }, []);
 
-  // useEffect(() => {
-  //   // setPedidoIdLocal(null);
-  //   setPedidoId("oApi6i01zqZOQKJENcE0");
-  // }, []);
+  useEffect(() => {
+    // storage.deleteItem("mesa");
+    getMesaLocal().then(mesaLocal => {
+      if (typeof mesaLocal === "undefined") {
+        api.createMesa().then(mesa => {
+          setMesa(mesa);
+          setMesaLocal(mesa);
+        });
+        return;
+      }
+      setMesa(mesaLocal);
+    });
+  }, []);
 
   useEffect(() => {
     // setPedidoIdLocal(null);
@@ -107,6 +120,12 @@ export const Provider = ({ children }: { children: Node }) => {
     });
   }, [pedidoId]);
 
+  useEffect(() => {
+    if (pedidoId && mesa) {
+      api.updatePedido(pedidoId, "mesa", mesa.numero);
+    }
+  }, [mesa, pedido]);
+
   const valuesProvider = {
     theme,
     setTheme,
@@ -115,7 +134,9 @@ export const Provider = ({ children }: { children: Node }) => {
     pedidoId,
     setPedidoId,
     pedido,
-    setPedido
+    setPedido,
+    mesa,
+    setMesa
   };
 
   return (
@@ -146,6 +167,11 @@ export const useTheme = () => {
       setThemeLocal(themeLocal);
     }
   ];
+};
+
+export const useMesa = () => {
+  const { mesa, setMesa } = useContext(GlobalContext);
+  return [mesa, setMesa];
 };
 
 export const useUser = () => {

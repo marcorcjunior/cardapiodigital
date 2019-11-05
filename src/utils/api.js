@@ -52,7 +52,7 @@ const getListPedido = (userId, action) =>
           .filter(pedido => pedido.userId === userId)
           .sort(
             (pedido1, pedido2) =>
-              moment(pedido1).unix() > moment(pedido2).unix()
+              moment(pedido1.data).unix() < moment(pedido2.data).unix()
           )
       );
     });
@@ -147,6 +147,42 @@ const updateUsuario = (userId, coluna, valor) =>
     .doc(userId)
     .update(coluna, valor);
 
+const getMesasa = () =>
+  db()
+    .collection("mesas")
+    .get()
+    .then(converterDados);
+
+const getMaxNumberMesa = () =>
+  getMesasa().then(data => Math.max.apply(Math, data.map(item => item.numero)));
+
+const findMesa = uid =>
+  db()
+    .collection("mesas")
+    .get()
+    .then(converterDados)
+    .then(mesas => mesas.find(mesa => mesa.uid === uid));
+
+const createMesa = () =>
+  db()
+    .collection("mesas")
+    .add({
+      uid: null,
+      numero: null
+    })
+    .then(async docRef => {
+      docRef.update("uid", docRef.id);
+      const numMesa = await getMaxNumberMesa();
+      let mesaNumber = 1;
+      if (numMesa) {
+        mesaNumber = parseInt(numMesa) + 1;
+      }
+      docRef.update("numero", mesaNumber);
+      return await findMesa(docRef.id);
+    })
+    .catch(error => {
+      console.error("Error adding document: ", error);
+    });
 
 const api = {
   createPedido,
@@ -161,7 +197,9 @@ const api = {
   findUsuario,
   getUsuario,
   createUsuario,
-  updateUsuario
+  updateUsuario,
+  findMesa,
+  createMesa
 };
 
 export default api;
