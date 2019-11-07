@@ -147,14 +147,14 @@ const updateUsuario = (userId, coluna, valor) =>
     .doc(userId)
     .update(coluna, valor);
 
-const getMesasa = () =>
+const getMesas = () =>
   db()
     .collection("mesas")
     .get()
     .then(converterDados);
 
 const getMaxNumberMesa = () =>
-  getMesasa().then(data => Math.max.apply(Math, data.map(item => item.numero)));
+  getMesas().then(data => Math.max.apply(Math, data.map(item => item.numero)));
 
 const findMesa = uid =>
   db()
